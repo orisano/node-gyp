@@ -13,6 +13,7 @@ if PY2:
     string_types = basestring
     text_type = unicode
     binary_type = str
+    xrange = xrange
 
     def iteritems(d):  # type: (_t.Dict[_t._KT, _t._VT]) -> _t.Iterable[_t.Tuple[_t._KT, _t._VT]]
         return d.iteritems()
@@ -20,6 +21,7 @@ else:
     string_types = str
     text_type = str
     binary_type = bytes
+    xrange = range
 
     def iteritems(d):  # type: (_t.Dict[_t._KT, _t._VT]) -> _t.Iterable[_t.Tuple[_t._KT, _t._VT]]
         return iter(d.items())

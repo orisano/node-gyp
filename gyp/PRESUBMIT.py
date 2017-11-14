@@ -8,6 +8,7 @@
 See http://dev.chromium.org/developers/how-tos/depottools/presubmit-scripts
 for more details about the presubmit API built into gcl.
 """
+import gyp.py3compat as py3compat
 
 
 PYLINT_BLACKLIST = [
@@ -85,7 +86,7 @@ def CheckChangeOnCommit(input_api, output_api):
 
   # Accept any year number from 2009 to the current year.
   current_year = int(input_api.time.strftime('%Y'))
-  allowed_years = (str(s) for s in reversed(xrange(2009, current_year + 1)))
+  allowed_years = (str(s) for s in reversed(py3compat.xrange(2009, current_year + 1)))
   years_re = '(' + '|'.join(allowed_years) + ')'
 
   # The (c) is deprecated, but tolerate it until it's removed from all files.
