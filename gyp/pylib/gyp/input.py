@@ -1844,7 +1844,7 @@ def VerifyNoGYPFileCircularDependencies(targets):
   # Create a DependencyGraphNode for each gyp file containing a target.  Put
   # it into a dict for easy access.
   dependency_nodes = {}
-  for target in targets.iterkeys():
+  for target in py3compat.iterkeys(targets):
     build_file = gyp.common.BuildFile(target)
     if not build_file in dependency_nodes:
       dependency_nodes[build_file] = DependencyGraphNode(build_file)

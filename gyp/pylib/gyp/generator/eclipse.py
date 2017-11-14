@@ -26,6 +26,8 @@ import gyp.msvs_emulation
 import shlex
 import xml.etree.cElementTree as ET
 
+import gyp.py3compat as py3compat
+
 generator_wants_static_library_dependencies_adjusted = False
 
 generator_default_variables = {
@@ -272,7 +274,7 @@ def WriteMacros(out, eclipse_langs, defines):
   out.write('    <language name="holder for library settings"></language>\n')
   for lang in eclipse_langs:
     out.write('    <language name="%s">\n' % lang)
-    for key in sorted(defines.iterkeys()):
+    for key in sorted(py3compat.iterkeys(defines)):
       out.write('      <macro><name>%s</name><value>%s</value></macro>\n' %
                 (escape(key), escape(defines[key])))
     out.write('    </language>\n')

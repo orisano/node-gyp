@@ -21,6 +21,9 @@ if PY2:
     def itervalues(d):  # type: (_t.Dict[_t._KT, _t._VT]) -> _t.Iterable[_t._VT]
         return d.itervalues()
 
+    def iterkeys(d):  # type: (_t.Dict[_t._KT, _t._VT]) -> _t.Iterable[_t._KT]
+        return d.iterkeys()
+
     from gyp.ordered_dict import OrderedDict
 else:
     string_types = str
@@ -33,5 +36,8 @@ else:
 
     def itervalues(d):  # type: (_t.Dict[_t._KT, _t._VT]) -> _t.Iterable[_t._VT]
         return iter(d.values())
+
+    def iterkeys(d):  # type: (_t.Dict[_t._KT, _t._VT]) -> _t.Iterable[_t._KT]
+        return iter(d.keys())
 
     from collections import OrderedDict
