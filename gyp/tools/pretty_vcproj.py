@@ -11,7 +11,9 @@
 
    It outputs the resulting xml to stdout.
 """
-
+from __future__ import (
+  print_function,
+)
 __author__ = 'nsylvain (Nicolas Sylvain)'
 
 import os
@@ -61,7 +63,7 @@ class CmpNode(object):
 def PrettyPrintNode(node, indent=0):
   if node.nodeType == Node.TEXT_NODE:
     if node.data.strip():
-      print '%s%s' % (' '*indent, node.data.strip())
+      print('%s%s' % (' '*indent, node.data.strip()))
     return
 
   if node.childNodes:
@@ -73,23 +75,23 @@ def PrettyPrintNode(node, indent=0):
 
   # Print the main tag
   if attr_count == 0:
-    print '%s<%s>' % (' '*indent, node.nodeName)
+    print('%s<%s>' % (' '*indent, node.nodeName))
   else:
-    print '%s<%s' % (' '*indent, node.nodeName)
+    print('%s<%s' % (' '*indent, node.nodeName))
 
     all_attributes = []
     for (name, value) in node.attributes.items():
       all_attributes.append((name, value))
       all_attributes.sort(CmpTuple())
     for (name, value) in all_attributes:
-      print '%s  %s="%s"' % (' '*indent, name, value)
-    print '%s>' % (' '*indent)
+      print('%s  %s="%s"' % (' '*indent, name, value))
+    print('%s>' % (' '*indent))
   if node.nodeValue:
-    print '%s  %s' % (' '*indent, node.nodeValue)
+    print('%s  %s' % (' '*indent, node.nodeValue))
 
   for sub_node in node.childNodes:
     PrettyPrintNode(sub_node, indent=indent+2)
-  print '%s</%s>' % (' '*indent, node.nodeName)
+  print('%s</%s>' % (' '*indent, node.nodeName))
 
 
 def FlattenFilter(node):
@@ -283,7 +285,7 @@ def main(argv):
 
   # check if we have exactly 1 parameter.
   if len(argv) < 2:
-    print ('Usage: %s "c:\\path\\to\\vcproj.vcproj" [key1=value1] '
+    print('Usage: %s "c:\\path\\to\\vcproj.vcproj" [key1=value1] '
            '[key2=value2]' % argv[0])
     return 1
 

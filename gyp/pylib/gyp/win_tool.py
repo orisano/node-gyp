@@ -8,6 +8,9 @@
 
 These functions are executed via gyp-win-tool when using the ninja generator.
 """
+from __future__ import (
+  print_function,
+)
 
 import os
 import re
@@ -128,7 +131,7 @@ class WinTool(object):
       if (not line.startswith('   Creating library ') and
           not line.startswith('Generating code') and
           not line.startswith('Finished generating code')):
-        print line
+        print(line)
     return link.returncode
 
   def ExecLinkWithManifests(self, arch, embed_manifest, out, ldcmd, resname,
@@ -217,7 +220,7 @@ class WinTool(object):
     out, _ = popen.communicate()
     for line in out.splitlines():
       if line and 'manifest authoring warning 81010002' not in line:
-        print line
+        print(line)
     return popen.returncode
 
   def ExecManifestToRc(self, arch, *args):
@@ -257,7 +260,7 @@ class WinTool(object):
                      for x in lines if x.startswith(prefixes))
     for line in lines:
       if not line.startswith(prefixes) and line not in processing:
-        print line
+        print(line)
     return popen.returncode
 
   def ExecAsmWrapper(self, arch, *args):
@@ -271,7 +274,7 @@ class WinTool(object):
           not line.startswith('Microsoft (R) Macro Assembler') and
           not line.startswith(' Assembling: ') and
           line):
-        print line
+        print(line)
     return popen.returncode
 
   def ExecRcWrapper(self, arch, *args):
@@ -285,7 +288,7 @@ class WinTool(object):
       if (not line.startswith('Microsoft (R) Windows (R) Resource Compiler') and
           not line.startswith('Copyright (C) Microsoft Corporation') and
           line):
-        print line
+        print(line)
     return popen.returncode
 
   def ExecActionWrapper(self, arch, rspfile, *dir):

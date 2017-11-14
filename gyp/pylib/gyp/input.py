@@ -1,6 +1,9 @@
 # Copyright (c) 2012 Google Inc. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
+from __future__ import (
+  print_function,
+)
 
 from compiler.ast import Const
 from compiler.ast import Dict
@@ -517,8 +520,8 @@ def CallLoadTargetBuildFile(global_flags,
     sys.stderr.write("gyp: %s\n" % e)
     return None
   except Exception as e:
-    print >>sys.stderr, 'Exception:', e
-    print >>sys.stderr, traceback.format_exc()
+    print("Exception:", e, file=sys.stderr)
+    print(traceback.format_exc(), file=sys.stderr)
     return None
 
 

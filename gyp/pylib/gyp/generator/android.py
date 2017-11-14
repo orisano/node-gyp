@@ -13,6 +13,9 @@
 # variables in .mk-files clobber one another, and furthermore that any
 # variables set potentially clash with other Android build system variables.
 # Try to avoid setting global variables where possible.
+from __future__ import (
+  print_function,
+)
 
 import gyp
 import gyp.common
@@ -252,8 +255,7 @@ class AndroidMkWriter(object):
       dirs = set()
       for out in outputs:
         if not out.startswith('$'):
-          print ('WARNING: Action for target "%s" writes output to local path '
-                 '"%s".' % (self.target, out))
+          print('WARNING: Action for target "%s" writes output to local path "%s".' % (self.target, out))
         dir = os.path.split(out)[0]
         if dir:
           dirs.add(dir)
@@ -357,8 +359,7 @@ class AndroidMkWriter(object):
         dirs = set()
         for out in outputs:
           if not out.startswith('$'):
-            print ('WARNING: Rule for target %s writes output to local path %s'
-                   % (self.target, out))
+            print('WARNING: Rule for target %s writes output to local path %s' % (self.target, out))
           dir = os.path.dirname(out)
           if dir:
             dirs.add(dir)
@@ -431,8 +432,7 @@ class AndroidMkWriter(object):
         # $(gyp_shared_intermediate_dir). Note that we can't use an assertion
         # because some of the gyp tests depend on this.
         if not copy['destination'].startswith('$'):
-          print ('WARNING: Copy rule for target %s writes output to '
-                 'local path %s' % (self.target, copy['destination']))
+          print('WARNING: Copy rule for target %s writes output to local path %s' % (self.target, copy['destination']))
 
         # LocalPathify() calls normpath, stripping trailing slashes.
         path = Sourceify(self.LocalPathify(path))
@@ -638,7 +638,7 @@ class AndroidMkWriter(object):
     elif self.type == 'none':
       target_ext = '.stamp'
     elif self.type != 'executable':
-      print ("ERROR: What output file should be generated?",
+      print("ERROR: What output file should be generated?",
              "type", self.type, "target", target)
 
     if self.type != 'static_library' and self.type != 'shared_library':
@@ -958,7 +958,7 @@ def PerformBuild(data, configurations, params):
   env = dict(os.environ)
   env['ONE_SHOT_MAKEFILE'] = makefile
   arguments = ['make', '-C', os.environ['ANDROID_BUILD_TOP'], 'gyp_all_modules']
-  print 'Building: %s' % arguments
+  print('Building: %s' % arguments)
   subprocess.check_call(arguments, env=env)
 
 
@@ -1067,7 +1067,7 @@ def GenerateOutput(target_list, target_dicts, data, params):
                                   write_alias_target=write_alias_targets,
                                   sdk_version=sdk_version)
     if android_module in android_modules:
-      print ('ERROR: Android module names must be unique. The following '
+      print('ERROR: Android module names must be unique. The following '
              'targets both generate Android module name %s.\n  %s\n  %s' %
              (android_module, android_modules[android_module],
               qualified_target))
