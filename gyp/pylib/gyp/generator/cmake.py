@@ -1212,7 +1212,7 @@ def GenerateOutput(target_list, target_dicts, data, params):
           arglists.append((target_list, target_dicts, data,
                            params, config_name))
           pool.map(CallGenerateOutputForConfig, arglists)
-      except KeyboardInterrupt, e:
+      except KeyboardInterrupt as e:
         pool.terminate()
         raise e
     else:
