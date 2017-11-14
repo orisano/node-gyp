@@ -1875,7 +1875,7 @@ def VerifyNoGYPFileCircularDependencies(targets):
 
   # Files that have no dependencies are treated as dependent on root_node.
   root_node = DependencyGraphNode(None)
-  for build_file_node in dependency_nodes.itervalues():
+  for build_file_node in py3compat.itervalues(dependency_nodes):
     if len(build_file_node.dependencies) == 0:
       build_file_node.dependencies.append(root_node)
       root_node.dependents.append(build_file_node)
