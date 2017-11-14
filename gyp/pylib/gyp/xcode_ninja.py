@@ -18,6 +18,8 @@ import os
 import re
 import xml.sax.saxutils
 
+import gyp.py3compat as py3compat
+
 
 def _WriteWorkspace(main_gyp, sources_gyp, params):
   """ Create a workspace to wrap main and sources gyp paths. """
@@ -161,7 +163,7 @@ def CreateWrapper(target_list, target_dicts, data, params):
     params: Dict of global options for gyp.
   """
   orig_gyp = params['build_files'][0]
-  for gyp_name, gyp_dict in data.iteritems():
+  for gyp_name, gyp_dict in py3compat.iteritems(data):
     if gyp_name == orig_gyp:
       depth = gyp_dict['_DEPTH']
 
@@ -228,7 +230,7 @@ def CreateWrapper(target_list, target_dicts, data, params):
   sources_target['configurations'] = {'Default': { 'include_dirs': [ depth ] } }
 
   sources = []
-  for target, target_dict in target_dicts.iteritems():
+  for target, target_dict in py3compat.iteritems(target_dicts):
     base = os.path.dirname(target)
     files = target_dict.get('sources', []) + \
             target_dict.get('mac_bundle_resources', [])

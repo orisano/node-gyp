@@ -11,6 +11,7 @@ import socket # for gethostname
 import gyp.common
 import gyp.easy_xml as easy_xml
 
+import gyp.py3compat as py3compat
 
 #------------------------------------------------------------------------------
 
@@ -91,7 +92,7 @@ class Writer(object):
 
     if environment and isinstance(environment, dict):
       env_list = ['%s="%s"' % (key, val)
-                  for (key,val) in environment.iteritems()]
+                  for (key,val) in py3compat.iteritems(environment)]
       environment = ' '.join(env_list)
     else:
       environment = ''
@@ -135,7 +136,7 @@ class Writer(object):
   def WriteIfChanged(self):
     """Writes the user file."""
     configs = ['Configurations']
-    for config, spec in sorted(self.configurations.iteritems()):
+    for config, spec in sorted(py3compat.iteritems(self.configurations)):
       configs.append(spec)
 
     content = ['VisualStudioUserFile',

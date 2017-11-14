@@ -7,6 +7,7 @@
 import copy
 import os
 
+import gyp.py3compat as py3compat
 
 # A dictionary mapping supported target types to extensions.
 TARGET_TYPE_EXT = {
@@ -235,7 +236,7 @@ def InsertLargePdbShims(target_list, target_dicts, vars):
 
     # Set up the shim to output its PDB to the same location as the final linker
     # target.
-    for config_name, config in shim_dict.get('configurations').iteritems():
+    for config_name, config in py3compat.iteritems(shim_dict.get('configurations')):
       pdb_path = _GetPdbPath(target_dict, config_name, vars)
 
       # A few keys that we don't want to propagate.

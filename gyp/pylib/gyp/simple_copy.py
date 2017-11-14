@@ -7,6 +7,9 @@ structures or complex types except for dicts and lists. This is
 because gyp copies so large structure that small copy overhead ends up
 taking seconds in a project the size of Chromium."""
 
+import gyp.py3compat as py3compat
+
+
 class Error(Exception):
   pass
 
@@ -38,7 +41,7 @@ d[list] = _deepcopy_list
 
 def _deepcopy_dict(x):
   y = {}
-  for key, value in x.iteritems():
+  for key, value in py3compat.iteritems(x):
     y[deepcopy(key)] = deepcopy(value)
   return y
 d[dict] = _deepcopy_dict

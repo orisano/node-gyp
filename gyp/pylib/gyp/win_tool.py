@@ -17,6 +17,8 @@ import stat
 import string
 import sys
 
+import gyp.py3compat as py3compat
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # A regex matching an argument corresponding to the output filename passed to
@@ -292,7 +294,7 @@ class WinTool(object):
     env = self._GetEnv(arch)
     # TODO(scottmg): This is a temporary hack to get some specific variables
     # through to actions that are set after gyp-time. http://crbug.com/333738.
-    for k, v in os.environ.iteritems():
+    for k, v in py3compat.iteritems(os.environ):
       if k not in env:
         env[k] = v
     args = open(rspfile).read()

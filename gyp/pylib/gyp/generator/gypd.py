@@ -36,6 +36,7 @@ import errno
 import os
 import pprint
 
+import gyp.py3compat as py3compat
 
 # These variables should just be spit back out as variable references.
 _generator_identity_variables = [
@@ -88,7 +89,7 @@ def GenerateOutput(target_list, target_dicts, data, params):
     if not output_file in output_files:
       output_files[output_file] = input_file
 
-  for output_file, input_file in output_files.iteritems():
+  for output_file, input_file in py3compat.iteritems(output_files):
     output = open(output_file, 'w')
     pprint.pprint(data[input_file], output)
     output.close()

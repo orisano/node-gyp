@@ -31,6 +31,8 @@ import gyp.xcode_emulation
 from gyp.common import GetEnvironFallback
 from gyp.common import GypError
 
+import gyp.py3compat as py3compat
+
 generator_default_variables = {
   'EXECUTABLE_PREFIX': '',
   'EXECUTABLE_SUFFIX': '',
@@ -664,7 +666,7 @@ def _ValidateSourcesForOSX(spec, all_sources):
     basenames.setdefault(basename, []).append(source)
 
   error = ''
-  for basename, files in basenames.iteritems():
+  for basename, files in py3compat.iteritems(basenames):
     if len(files) > 1:
       error += '  %s: %s\n' % (basename, ' '.join(files))
 
