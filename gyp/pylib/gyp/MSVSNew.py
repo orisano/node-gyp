@@ -60,9 +60,9 @@ def MakeGuid(name, seed='msvs_new'):
 
 
 class MSVSSolutionEntry(object):
-  def __cmp__(self, other):
+  def __lt__(self, other):
     # Sort by name then guid (so things are in order on vs2008).
-    return cmp((self.name, self.get_guid()), (other.name, other.get_guid()))
+    return (self.name, self.get_guid()) < (other.name, other.get_guid())
 
 
 class MSVSFolder(MSVSSolutionEntry):

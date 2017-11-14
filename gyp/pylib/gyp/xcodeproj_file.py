@@ -1005,7 +1005,7 @@ class XCHierarchicalElement(XCObject):
 
     return hashables
 
-  def Compare(self, other):
+  def __lt__(self, other):
     # Allow comparison of these types.  PBXGroup has the highest sort rank;
     # PBXVariantGroup is treated as equal to PBXFileReference.
     valid_class_types = {
@@ -1018,45 +1018,10 @@ class XCHierarchicalElement(XCObject):
 
     if self_type == other_type:
       # If the two objects are of the same sort rank, compare their names.
-      return cmp(self.Name(), other.Name())
+      return self.Name() < other.Name()
 
     # Otherwise, sort groups before everything else.
-    if self_type == 'group':
-      return -1
-    return 1
-
-  def CompareRootGroup(self, other):
-    # This function should be used only to compare direct children of the
-    # containing PBXProject's mainGroup.  These groups should appear in the
-    # listed order.
-    # TODO(mark): "Build" is used by gyp.generator.xcode, perhaps the
-    # generator should have a way of influencing this list rather than having
-    # to hardcode for the generator here.
-    order = ['Source', 'Intermediates', 'Projects', 'Frameworks', 'Products',
-             'Build']
-
-    # If the groups aren't in the listed order, do a name comparison.
-    # Otherwise, groups in the listed order should come before those that
-    # aren't.
-    self_name = self.Name()
-    other_name = other.Name()
-    self_in = isinstance(self, PBXGroup) and self_name in order
-    other_in = isinstance(self, PBXGroup) and other_name in order
-    if not self_in and not other_in:
-      return self.Compare(other)
-    if self_name in order and not other_name in order:
-      return -1
-    if other_name in order and not self_name in order:
-      return 1
-
-    # If both groups are in the listed order, go by the defined order.
-    self_index = order.index(self_name)
-    other_index = order.index(other_name)
-    if self_index < other_index:
-      return -1
-    if self_index > other_index:
-      return 1
-    return 0
+    return self_type == 'group'
 
   def PathFromSourceTreeAndPath(self):
     # Turn the object's sourceTree and path properties into a single flat
@@ -1404,7 +1369,7 @@ class PBXGroup(XCHierarchicalElement):
 
   def SortGroup(self):
     self._properties['children'] = \
-        sorted(self._properties['children'], cmp=lambda x,y: x.Compare(y))
+        sorted(self._properties['children'])
 
     # Recurse.
     for child in self._properties['children']:
@@ -2641,9 +2606,43 @@ class PBXProject(XCContainerPortal):
   def SortGroups(self):
     # Sort the children of the mainGroup (like "Source" and "Products")
     # according to their defined order.
+    class RootGroupComparer(object):
+      def __init__(self, x):
+        self.x = x
+
+      def __lt__(self, other):
+        # This function should be used only to compare direct children of the
+        # containing PBXProject's mainGroup.  These groups should appear in the
+        # listed order.
+        # TODO(mark): "Build" is used by gyp.generator.xcode, perhaps the
+        # generator should have a way of influencing this list rather than having
+        # to hardcode for the generator here.
+        order = ['Source', 'Intermediates', 'Projects', 'Frameworks', 'Products',
+                 'Build']
+
+        # If the groups aren't in the listed order, do a name comparison.
+        # Otherwise, groups in the listed order should come before those that
+        # aren't.
+        self_name = self.x.Name()
+        other_name = other.Name()
+        self_in = isinstance(self.x, PBXGroup) and self_name in order
+        other_in = isinstance(self.x, PBXGroup) and other_name in order
+        if not self_in and not other_in:
+          return self.x < other
+        if self_name in order and not other_name in order:
+          return True
+        if other_name in order and not self_name in order:
+          return False
+
+        # If both groups are in the listed order, go by the defined order.
+        self_index = order.index(self_name)
+        other_index = order.index(other_name)
+        return self_index < other_index
+
+
     self._properties['mainGroup']._properties['children'] = \
         sorted(self._properties['mainGroup']._properties['children'],
-               cmp=lambda x,y: x.CompareRootGroup(y))
+               key=RootGroupComparer)
 
     # Sort everything else by putting group before files, and going
     # alphabetically by name within sections of groups and files.  SortGroup
@@ -2734,9 +2733,7 @@ class PBXProject(XCContainerPortal):
 
       # Xcode seems to sort this list case-insensitively
       self._properties['projectReferences'] = \
-          sorted(self._properties['projectReferences'], cmp=lambda x,y:
-                 cmp(x['ProjectRef'].Name().lower(),
-                     y['ProjectRef'].Name().lower()))
+          sorted(self._properties['projectReferences'], key=lambda x: x['ProjectRef'].Name().lower())
     else:
       # The link already exists.  Pull out the relevnt data.
       project_ref_dict = self._other_pbxprojects[other_pbxproject]
@@ -2833,18 +2830,13 @@ class PBXProject(XCContainerPortal):
     # same order that the targets are sorted in the remote project file.  This
     # is the sort order used by Xcode.
 
-    def CompareProducts(x, y, remote_products):
+    def CompareProducts(remote_products):
       # x and y are PBXReferenceProxy objects.  Go through their associated
       # PBXContainerItem to get the remote PBXFileReference, which will be
       # present in the remote_products list.
-      x_remote = x._properties['remoteRef']._properties['remoteGlobalIDString']
-      y_remote = y._properties['remoteRef']._properties['remoteGlobalIDString']
-      x_index = remote_products.index(x_remote)
-      y_index = remote_products.index(y_remote)
-
       # Use the order of each remote PBXFileReference in remote_products to
       # determine the sort order.
-      return cmp(x_index, y_index)
+      return lambda x: remote_products.index(x._properties['remoteRef']._properties['remoteGlobalIDString'])
 
     for other_pbxproject, ref_dict in py3compat.iteritems(self._other_pbxprojects):
       # Build up a list of products in the remote project file, ordered the
@@ -2860,7 +2852,7 @@ class PBXProject(XCContainerPortal):
       product_group = ref_dict['ProductGroup']
       product_group._properties['children'] = sorted(
           product_group._properties['children'],
-          cmp=lambda x, y, rp=remote_products: CompareProducts(x, y, rp))
+          key=CompareProducts(remote_products))
 
 
 class XCProjectFile(XCObject):
@@ -2891,8 +2883,7 @@ class XCProjectFile(XCObject):
       self._XCPrint(file, 0, '{ ')
     else:
       self._XCPrint(file, 0, '{\n')
-    for property, value in sorted(py3compat.iteritems(self._properties),
-                                  cmp=lambda x, y: cmp(x, y)):
+    for property, value in sorted(py3compat.iteritems(self._properties)):
       if property == 'objects':
         self._PrintObjects(file)
       else:
@@ -2919,7 +2910,7 @@ class XCProjectFile(XCObject):
       self._XCPrint(file, 0, '\n')
       self._XCPrint(file, 0, '/* Begin ' + class_name + ' section */\n')
       for object in sorted(objects_by_class[class_name],
-                           cmp=lambda x, y: cmp(x.id, y.id)):
+                           key=lambda x: x.id):
         object.Print(file)
       self._XCPrint(file, 0, '/* End ' + class_name + ' section */\n')
 

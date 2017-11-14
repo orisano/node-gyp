@@ -28,14 +28,14 @@ ARGUMENTS = None
 
 class CmpTuple(object):
   """Compare function between 2 tuple."""
-  def __call__(self, x, y):
-    return cmp(x[0], y[0])
+  def __call__(self, x):
+    return x[0]
 
 
 class CmpNode(object):
   """Compare function between 2 xml nodes."""
 
-  def __call__(self, x, y):
+  def __call__(self, x):
     def get_string(node):
       node_string = "node"
       node_string += node.nodeName
@@ -50,14 +50,13 @@ class CmpNode(object):
         for (name, value) in node.attributes.items():
           all_nodes.append((name, value))
 
-        all_nodes.sort(CmpTuple())
+        all_nodes.sort(key=CmpTuple())
         for (name, value) in all_nodes:
           node_string += name
           node_string += value
 
       return node_string
-
-    return cmp(get_string(x), get_string(y))
+    return get_string(x)
 
 
 def PrettyPrintNode(node, indent=0):
@@ -82,7 +81,7 @@ def PrettyPrintNode(node, indent=0):
     all_attributes = []
     for (name, value) in node.attributes.items():
       all_attributes.append((name, value))
-      all_attributes.sort(CmpTuple())
+      all_attributes.sort(key=CmpTuple())
     for (name, value) in all_attributes:
       print('%s  %s="%s"' % (' '*indent, name, value))
     print('%s>' % (' '*indent))
@@ -188,7 +187,7 @@ def CleanupVcproj(node):
 
 
   # Sort the list.
-  node_array.sort(CmpNode())
+  node_array.sort(key=CmpNode())
 
   # Insert the nodes in the correct order.
   for new_node in node_array:
